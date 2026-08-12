@@ -7,6 +7,7 @@ import pool from './db/pool.js';
 import authRouter from './routes/auth.js';
 import tmdbRouter from './routes/tmdb.js';
 import vibesRouter from './routes/vibes.js';
+import watchlistRouter from './routes/watchlist.js';
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ app.use(express.json());
 app.use('/api/auth', authRouter);
 app.use('/api/tmdb', tmdbRouter);
 app.use('/api/vibes', vibesRouter);
+app.use('/api/watchlist', watchlistRouter);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
