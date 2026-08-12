@@ -1,4 +1,4 @@
-import './config.js'; // MUST be first -- loads .env before any other module
+import './env.js'; // MUST be first -- loads .env before any other module
 import express from 'express';
 import session from 'express-session';
 import cors from 'cors';
@@ -9,6 +9,7 @@ import tmdbRouter from './routes/tmdb.js';
 import vibesRouter from './routes/vibes.js';
 import watchlistRouter from './routes/watchlist.js';
 import reviewsRouter from './routes/reviews.js';
+import discoverRouter from './routes/discover.js';
 import { connectMongo } from './db/mongo.js';
 
 const app = express();
@@ -38,6 +39,7 @@ app.use('/api/tmdb', tmdbRouter);
 app.use('/api/vibes', vibesRouter);
 app.use('/api/watchlist', watchlistRouter);
 app.use('/api/reviews', reviewsRouter);
+app.use('/api/discover', discoverRouter);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
