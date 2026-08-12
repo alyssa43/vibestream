@@ -8,6 +8,7 @@ import authRouter from './routes/auth.js';
 import tmdbRouter from './routes/tmdb.js';
 import vibesRouter from './routes/vibes.js';
 import watchlistRouter from './routes/watchlist.js';
+import reviewsRouter from './routes/reviews.js';
 import { connectMongo } from './db/mongo.js';
 
 const app = express();
@@ -36,6 +37,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/tmdb', tmdbRouter);
 app.use('/api/vibes', vibesRouter);
 app.use('/api/watchlist', watchlistRouter);
+app.use('/api/reviews', reviewsRouter);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
