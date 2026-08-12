@@ -1,15 +1,14 @@
+import './config.js'; // MUST be first -- loads .env before any other module
 import express from 'express';
 import session from 'express-session';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import pgSession from 'connect-pg-simple';
 import pool from './db/pool.js';
 import authRouter from './routes/auth.js';
 import tmdbRouter from './routes/tmdb.js';
 import vibesRouter from './routes/vibes.js';
 import watchlistRouter from './routes/watchlist.js';
-
-dotenv.config();
+import { connectMongo } from './db/mongo.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -42,6 +41,8 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-app.listen(PORT, () => {
-  console.log(`VibeStream server running on http://localhost:${PORT}`);
-});
+connectMongo().then(() => {
+  app.listen(PORT, () => {
+    console.log(`🎬🍿 VibeStream server running on http://localhost:${PORT}`);
+  });
+}) ;
