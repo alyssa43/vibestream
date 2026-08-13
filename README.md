@@ -157,7 +157,7 @@ All require a valid session.
 | POST | `/api/watchlist` | Add a title |
 | DELETE | `/api/watchlist/:mediaType/:tmdbId` | Remove a title |
 | GET | `/api/reviews` | Current user's reviews |
-| GET | `/api/reviews/:mediaType/:tmdbId` | Review for one title |
+| GET | `/api/reviews/:mediaType/:tmdbId` | Review for one title, `review: null` if none |
 | PUT | `/api/reviews/:mediaType/:tmdbId` | Create or update a review |
 | DELETE | `/api/reviews/:mediaType/:tmdbId` | Delete a review |
 

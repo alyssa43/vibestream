@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth.js';
+import { useToast } from '../context/useToast.js';
 import styles from './Nav.module.css';
 
 const NAV_LINKS = [
@@ -12,6 +13,7 @@ const NAV_LINKS = [
 
 export default function Nav() {
   const { user, logout, deleteAccount } = useAuth();
+  const { showToast } = useToast();
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [password, setPassword] = useState('');
@@ -65,8 +67,17 @@ export default function Nav() {
 
   async function handleLogout() {
     closeMenu();
-    await logout();
+    // Navigate before awaiting logout: Watchlist's auth guard redirects to
+    // /login as soon as `user` clears, so if we're on /watchlist we need to
+    // already be on / by the time that happens, or the guard flashes /login
+    // right after a deliberate logout.
     navigate('/');
+    try {
+      await logout();
+      showToast('Logged out successfully');
+    } catch {
+      showToast('Something went wrong logging out. Please try again.', 'error');
+    }
   }
 
   async function handleDeleteAccount() {
@@ -119,7 +130,9 @@ export default function Nav() {
             </button>
             {menuOpen && (
               <div className={styles.menu} role="menu">
-                <p className={styles.menuEmail}>{user.email}</p>
+                <p className={styles.menuEmail} title={user.email}>
+                  {user.email}
+                </p>
                 {confirmingDelete ? (
                   <div className={styles.deleteConfirm}>
                     <p className={styles.deleteWarning}>

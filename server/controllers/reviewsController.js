@@ -31,10 +31,9 @@ export async function getReview(req, res) {
       media_type: mediaType,
     }).lean();
 
-    if (!review) {
-      return res.status(404).json({ error: 'No review found for that title' });
-    }
-
+    // Mongoose's findOne returns null when nothing matches, and null is a
+    // valid answer here: "does this user have a review?" can legitimately
+    // be "no". A 404 would say the endpoint doesn't exist, which is wrong.
     res.json({ review });
   } catch (err) {
     console.error('Error fetching review:', err);

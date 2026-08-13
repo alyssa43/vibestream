@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth.js';
+import { useToast } from '../context/useToast.js';
 import styles from './Auth.module.css';
 
 export default function Login() {
   const { login } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -17,6 +19,7 @@ export default function Login() {
     setSubmitting(true);
     try {
       await login(email, password);
+      showToast('Logged in successfully');
       navigate('/');
     } catch (err) {
       setError(err.message || 'Failed to log in.');

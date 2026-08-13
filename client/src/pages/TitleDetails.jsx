@@ -4,6 +4,7 @@ import { getProviders, getTitleDetails } from '../api/client.js';
 import ReviewSection from '../components/ReviewSection.jsx';
 import { useAuth } from '../context/useAuth.js';
 import { backdropUrl, posterUrl } from '../lib/images.js';
+import { dedupeProviders } from '../lib/providers.js';
 import styles from './TitleDetails.module.css';
 
 export default function TitleDetails() {
@@ -73,6 +74,7 @@ function TitleDetailsView({ mediaType, id }) {
   const poster = posterUrl(details.poster_path, 500);
   const onList = isOnWatchlist(mediaType, Number(id));
   const usProviders = providers?.results?.US;
+  const streamingProviders = dedupeProviders(usProviders?.flatrate);
 
   async function handleToggleWatchlist() {
     if (!user) {
@@ -146,9 +148,13 @@ function TitleDetailsView({ mediaType, id }) {
 
           <section className={styles.providers}>
             <h2 className={styles.sectionHeading}>Where to watch</h2>
-            {usProviders?.flatrate?.length ? (
+            {streamingProviders.length ? (
               <div className={styles.providerLogos}>
-                {usProviders.flatrate.map((p) => (
+                {/* Logos aren't clickable: TMDB only gives one region-level
+                    link, not a per-provider deep link, and the underlying
+                    data is JustWatch's, so a per-logo link needs their
+                    attribution terms checked first. Out of scope here. */}
+                {streamingProviders.map((p) => (
                   <img
                     key={p.provider_name}
                     src={`https://image.tmdb.org/t/p/w92${p.logo_path}`}
