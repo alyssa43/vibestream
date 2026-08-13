@@ -1,4 +1,6 @@
-const BASE = '/api';
+// import.meta.env.BASE_URL is Vite's `base` config: '/vibestream/' in
+// production, '/' in dev. Strip the trailing slash so we don't build '//api'.
+const BASE = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/api`;
 
 async function request(path, options = {}) {
   const res = await fetch(`${BASE}${path}`, {
