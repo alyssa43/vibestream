@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { getVibeRow } from '../api/client.js';
 import Card from './Card.jsx';
+import ViewAllCard from './ViewAllCard.jsx';
 import styles from './VibeRow.module.css';
 
 const SKELETON_COUNT = 8;
@@ -78,6 +79,8 @@ export default function VibeRow({ vibe }) {
             titles.map((title) => (
               <Card key={`${title.media_type}:${title.tmdb_id}`} title={title} accent={accent} />
             ))}
+
+          {!error && titles && titles.length > 0 && <ViewAllCard slug={slug} accent={accent} />}
         </div>
 
         {canScrollRight && (

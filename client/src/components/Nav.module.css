@@ -14,9 +14,10 @@
 }
 
 .wordmark {
-  font-weight: 800;
-  font-size: 1.1rem;
-  letter-spacing: 0.08em;
+  font-family: 'Jost', var(--font-sans);
+  font-weight: 300;
+  font-size: 1.25rem;
+  letter-spacing: 0.15em;
   color: var(--text);
   flex: 0 0 auto;
 }
@@ -29,7 +30,8 @@
   display: flex;
   gap: clamp(16px, 3vw, 36px);
   flex: 1;
-  justify-content: center;
+  justify-content: flex-end;
+  padding-right: clamp(24px, 4vw, 56px);
 }
 
 .link {
@@ -117,6 +119,7 @@
 @media (max-width: 720px) {
   .links {
     gap: 14px;
+    padding-right: 20px;
   }
 
   .link {
@@ -124,7 +127,7 @@
   }
 
   .wordmark {
-    font-size: 0.95rem;
+    font-size: 1.05rem;
   }
 }
 
@@ -135,6 +138,7 @@
 
   .links {
     gap: 10px;
+    padding-right: 12px;
   }
 
   .link {
