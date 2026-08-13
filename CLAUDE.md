@@ -93,6 +93,30 @@ The databases are not linked. A review's `user_id` is a plain number pointing
 at `users.id` in Postgres, enforced by nothing. Cross database joins are not
 possible; the Express layer is the only connection between them.
 
+## Deployed behind a reverse proxy
+
+Production runs behind Nginx at `alyssaeaster.dev/vibestream`, which introduces
+constraints that cannot reproduce locally:
+
+**`app.set('trust proxy', 1)` in `server.js` is required, not optional.** Nginx
+terminates SSL and forwards to Express over plain HTTP on localhost, so Express
+sees an insecure connection. With `cookie.secure: true` (which `NODE_ENV=production`
+turns on), express-session then refuses to send a session cookie at all, silently.
+No error, no `Set-Cookie` header, login appears to succeed and every subsequent
+request is unauthenticated. Trusting the proxy makes Express read
+`X-Forwarded-Proto` instead.
+
+**The client API base is derived from Vite's `base` config.** `src/api/client.js`
+builds it from `import.meta.env.BASE_URL`, so requests go to `/api` in dev (caught
+by the Vite proxy) and `/vibestream/api` in production. Never hardcode `/api`.
+
+**React Router needs `basename="/vibestream"`** to match `base: '/vibestream/'`.
+Note the trailing slash on one and not the other. `basename` only affects routing;
+it has no effect on `fetch` calls.
+
+**Nginx strips the subpath.** The `location /vibestream/api/` block proxies to
+`http://localhost:3001/api/`, so Express routes need no knowledge of the subpath.
+
 ## TMDB gotchas
 
 - Movies and TV have **separate ID spaces**. TMDB ID 1399 is both a movie and a
@@ -111,11 +135,21 @@ possible; the Express layer is the only connection between them.
 
 ## Known technical debt, deliberately accepted
 
-**Homepage rows fetch live.** `GET /api/vibes/:slug` fires one TMDB call per
-title, so a single row costs 20 to 34 requests and the full homepage costs over
-200. The intended fix is caching `title`, `poster_path`, and `release_date` into
-the `vibe_titles` table and backfilling once. This was deferred on purpose to
-ship. Treat it as a stretch goal, not a bug.
+**Homepage rows fetch live, and this now causes real rate limiting.** `GET
+/api/vibes/:slug` fires one TMDB call per title, so a single row costs 20 to 34
+requests and the full homepage costs over 200. In production this returns 429 Too
+Many Requests from TMDB, and because `fetchTmdbDetailsMany` drops failed titles
+silently, rows render short or empty depending on timing. The fix is caching
+`title`, `poster_path`, and `release_date` into the `vibe_titles` table and
+backfilling once. This is no longer a stretch goal.
+
+Note this affects only the curated rows. Discover, search, and title details each
+cost one or two calls per request and are fine.
+
+**Rows can silently return fewer titles than curated.** `fetchTmdbDetailsMany`
+drops any title whose individual TMDB fetch fails and returns a shorter array with
+no error signal. A vibe curated for 24 titles may render 19. Expected behavior,
+not a client bug.
 
 **Rows can silently return fewer titles than curated.** `fetchTmdbDetailsMany`
 drops any title whose individual TMDB fetch fails and returns a shorter array

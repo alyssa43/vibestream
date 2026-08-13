@@ -206,14 +206,38 @@ results against 126 for the genre equivalent.
 
 ## Deployment
 
-Deploys to a DigitalOcean droplet (Ubuntu 24.04) at
-`alyssaeaster.dev/vibestream`, behind Nginx with Let's Encrypt SSL, running
-under PM2 alongside a separate portfolio site.
+Live at `https://alyssaeaster.dev/vibestream`, on a DigitalOcean droplet
+(Ubuntu 24.04, 512MB) behind Nginx with Let's Encrypt SSL, running under PM2
+alongside a separate portfolio site at the domain root.
 
-Production differences from local:
+### What differs from local
 
-- `NODE_ENV=production`, which flips the session cookie to HTTPS only
-- A distinct `SESSION_SECRET`
-- A `POSTGRES_URL` with a real password, since the VPS Postgres is not
-  trust based
-- Vite built with `base: '/vibestream/'` for subpath routing
+**Databases.** Postgres uses `vibestream_prod` with password authentication over
+TCP, not the peer-authenticated socket connection that works locally. MongoDB has
+`authorization` enabled, so it needs a dedicated `vibestream_app` user scoped to
+`readWrite` on `vibestream_prod` only, and the connection string needs
+`?authSource=vibestream_prod` because the user was created on that database rather
+than on `admin`.
+
+**Environment.** `NODE_ENV=production` turns on `cookie.secure`, so session
+cookies only travel over HTTPS. A separate `SESSION_SECRET` from the dev one.
+
+**Trust proxy.** `app.set('trust proxy', 1)` is required. Without it, Express sees
+Nginx's plain-HTTP forward as insecure and silently refuses to set secure session
+cookies, which breaks every authenticated route while login still appears to work.
+
+**Subpath.** Vite builds with `base: '/vibestream/'`, React Router uses
+`basename="/vibestream"`, and the API client derives its base from
+`import.meta.env.BASE_URL`.
+
+### Nginx
+
+Three location blocks above the portfolio's `location /`:
+
+- `location = /vibestream` redirects to the trailing-slash form
+- `location /vibestream/api/` proxies to `http://localhost:3001/api/`, stripping
+  the subpath so Express routes are unchanged
+- `location /vibestream/` serves the static Vite build from `client/dist` with
+  `try_files` falling back to `index.html` so client-side routes resolve
+
+### Deploying an update
