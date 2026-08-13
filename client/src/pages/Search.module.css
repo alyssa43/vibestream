@@ -1,0 +1,61 @@
+.page {
+  padding: calc(var(--nav-height) + 32px) 0 80px;
+  min-height: 100svh;
+}
+
+.searchBar {
+  padding: 0 clamp(20px, 4vw, 48px);
+  margin-bottom: 32px;
+}
+
+.input {
+  width: 100%;
+  max-width: 560px;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+.error {
+  padding: 0 clamp(20px, 4vw, 48px);
+  color: var(--danger);
+}
+
+.loadMoreWrap {
+  display: flex;
+  justify-content: center;
+  padding: 24px clamp(20px, 4vw, 48px) 0;
+}
+
+.loadMoreButton {
+  padding: 12px 28px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.loadMoreButton:hover {
+  background: var(--surface-hover);
+  border-color: var(--violet);
+}
+
+.loadMoreButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { getVibeRow } from '../api/client.js';
 import Card from './Card.jsx';
+import SkeletonCard from './SkeletonCard.jsx';
 import ViewAllCard from './ViewAllCard.jsx';
 import styles from './VibeRow.module.css';
 
@@ -66,9 +67,7 @@ export default function VibeRow({ vibe }) {
           {error && <p className={styles.error}>Couldn&rsquo;t load this row. {error}</p>}
 
           {!error && titles === null &&
-            Array.from({ length: SKELETON_COUNT }).map((_, i) => (
-              <div key={i} className={styles.skeletonCard} aria-hidden="true" />
-            ))}
+            Array.from({ length: SKELETON_COUNT }).map((_, i) => <SkeletonCard key={i} />)}
 
           {!error && titles !== null && titles.length === 0 && (
             <p className={styles.empty}>No titles found for this vibe yet.</p>

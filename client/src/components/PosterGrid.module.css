@@ -1,0 +1,7 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 168px));
+  justify-content: center;
+  gap: 18px;
+  padding: 4px clamp(20px, 4vw, 48px) 8px;
+}

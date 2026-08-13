@@ -216,3 +216,202 @@ server's error message inline on failure. On success, route to `/`.
 
 Do not build: search UI, watchlist page, reviews UI, View All pages. Do not
 modify `server/`. Do not add a component library — plain CSS or CSS modules.
+
+# VibeStream Frontend — Phase 2 Spec
+
+Builds on the completed phase 1 client. Reuse the existing components, context,
+API client, and styling. Do not restructure what already works, and do not
+modify anything in `server/`.
+
+**Scope of this phase:** search, My List, reviews UI on the title details page,
+View All pages, and the Explore page. After this phase the app is
+feature complete and ready to deploy.
+
+---
+
+## Carried over from phase 1
+
+These already exist and should be reused, not rebuilt:
+
+- Auth context holding the current user, restored via `GET /api/auth/me`
+- Watchlist held in that same context, giving instant membership checks
+- The poster card component, with hover glow and click through to
+  `/title/:mediaType/:id`
+- The View All card at the end of each homepage row, currently linking to a
+  `/vibe/:slug` placeholder that this phase replaces
+- Placeholder pages at `/search`, `/watchlist`, `/explore`, and `/vibe/:slug`,
+  all of which this phase replaces with real pages
+
+Same hard rule as phase 1: **the client never calls TMDB directly.** Every
+request goes through our own `/api/*` routes, and no TMDB token appears in
+client code.
+
+---
+
+## 1. Search (`/search`)
+
+**Endpoint:** `GET /api/tmdb/search/multi?query=...&page=1`
+
+This is a raw TMDB passthrough, so the response is TMDB's shape, not our card
+shape:
+
+```json
+{ "page": 1, "total_pages": 12, "total_results": 231,
+  "results": [
+    { "id": 9603, "media_type": "movie", "title": "Clueless",
+      "poster_path": "/8AwV....jpg", "release_date": "1995-07-19",
+      "overview": "...", "vote_average": 7.3 },
+    { "id": 3921, "media_type": "tv", "name": "Clueless",
+      "first_air_date": "1996-09-20", "...": "..." },
+    { "id": 12345, "media_type": "person", "name": "Alicia Silverstone",
+      "profile_path": "...", "known_for": [] }
+  ]}
+```
+
+Three things to handle:
+
+- **Filter out `media_type: "person"` results entirely.** People carry real
+  data, but `/api/tmdb/:mediaType/:id` only accepts `movie` or `tv`, so a
+  person card would have nowhere to click through to. Dropping them is
+  deliberate for this phase.
+- **Movies use `title`/`release_date`; TV uses `name`/`first_air_date`.**
+  Normalize into the card shape the existing card component expects.
+- `poster_path` can be null. Use the same placeholder treatment as elsewhere.
+
+**Behavior.** Search input at the top of the page, debounced by roughly 300ms so
+each keystroke does not fire a request. Put the query in the URL as
+`?q=...` so a search is linkable and survives a refresh. Results in a poster
+grid, same card component and grid as the View All page below. Paginate with a
+"Load more" button, not infinite scroll.
+
+**States.** Before any query, an empty state inviting a search. Zero results
+after a query, a clear message naming the query. Requests in flight, skeleton
+cards rather than a blocking spinner.
+
+---
+
+## 2. My List (`/watchlist`)
+
+**Endpoint:** `GET /api/watchlist` returns `{ titles: [...] }` already in card
+shape, newest first. Requires a session.
+
+**Behavior.** Poster grid of saved titles. Each card gets a remove affordance
+(a small button on hover, or an X in the corner) calling
+`DELETE /api/watchlist/:mediaType/:tmdbId`, which returns 204. Remove the card
+from the grid optimistically and restore it if the request fails.
+
+Reuse the watchlist already in context rather than refetching on mount, and keep
+context in sync when a title is removed, so the details page toggle stays
+correct without a reload.
+
+**States.** Logged out, redirect to `/login`. Empty list, an empty state that
+points somewhere useful (a link back to the homepage), not just "nothing here."
+
+---
+
+## 3. Reviews UI (on `/title/:mediaType/:id`)
+
+Replaces the "Reviews are coming in a later phase" placeholder.
+
+**Endpoints:**
+
+- `GET /api/reviews/:mediaType/:tmdbId` returns `{ review }`, or 404 if the
+  user has not reviewed this title. A 404 here is a normal state, not an error
+  to surface.
+- `PUT /api/reviews/:mediaType/:tmdbId` with body `{ text, mood_tags }`.
+  Creates or updates in one call. Requires at least one of a non-empty `text`
+  or a non-empty `mood_tags` array, otherwise returns 400.
+- `DELETE /api/reviews/:mediaType/:tmdbId` returns 204, or 404 if absent.
+
+A review document looks like:
+
+```json
+{ "review": { "_id": "...", "user_id": 1, "tmdb_id": 9603,
+              "media_type": "movie", "text": "...",
+              "mood_tags": ["nostalgic", "comfort"],
+              "created_at": "...", "updated_at": "..." }}
+```
+
+**The form.** A textarea for the review body, plus free-entry mood tags: type a
+tag, press Enter or comma to commit it, each tag renders as a removable chip.
+Tags are the user's own words, not a fixed list. Save button calls PUT.
+
+Note that `mood_tags` replaces rather than merges on save, so the form must
+submit the complete tag array, not just newly added ones.
+
+**States.** Logged out, show a prompt to log in instead of the form. No review
+yet, show an empty form or a "write a review" affordance. Review exists, show
+it with edit and delete controls, prefilled on edit. Include the `updated_at`
+date on a saved review.
+
+---
+
+## 4. View All (`/vibe/:slug`)
+
+**Endpoint:** `GET /api/discover/:slug?page=1`
+
+```json
+{ "vibe": "edge-of-your-seat", "page": 1, "total_pages": 17,
+  "titles": [ { "tmdb_id": 155, "media_type": "movie", "title": "...",
+                "poster_path": "...", "release_date": "...",
+                "overview": "...", "vote_average": 8.5 } ]}
+```
+
+Returns 404 for an unknown slug.
+
+**Page header.** The vibe's name, description, and accent color are not in the
+discover response. They come from `GET /api/vibes`, which the homepage already
+fetches. Hold that manifest in context so this page can read from it rather than
+refetching, and so a direct load of `/vibe/:slug` still works.
+
+**Results per page vary by vibe, and that is expected:**
+
+- Most vibes return 40 per page, 20 movies plus 20 TV
+- Spooky & Eerie returns 20. It is movies only by design, because TMDB has no
+  Horror genre for television
+- Guilty Pleasure returns about 59. It fires two TV queries, adult animation and
+  reality, and one blocklisted entry is filtered server side
+
+Do not treat these differences as bugs or try to normalize them.
+
+**Layout.** Poster grid, same card component as everywhere else. Movies come
+before TV in the response; render in the order returned. Header carries the
+accent color the way homepage rows do. "Load more" button, hidden once `page`
+reaches `total_pages`. Append to the grid rather than replacing it.
+
+---
+
+## 5. Explore (`/explore`)
+
+**Endpoint:** `GET /api/vibes`, the manifest already in context.
+
+A grid of the 8 vibes as entry cards. Each card shows the vibe name and
+description, uses its accent color, and links to `/vibe/:slug`. No TMDB data on
+this page at all, so it should load instantly.
+
+This is the browsable index of the whole app: the homepage shows curated picks
+per vibe, and Explore is how someone gets to the full discovery page for a mood
+without scrolling a row to its end.
+
+---
+
+## Cross cutting
+
+- Reuse the existing card, grid, skeleton, and empty state patterns. If a
+  pattern does not exist yet and is needed twice, extract it into a shared
+  component rather than duplicating it.
+- Every fetch keeps `credentials: 'include'`.
+- Protected pages redirect to `/login` when logged out rather than rendering an
+  error.
+- Empty and error states get real copy that says what happened and what to do
+  next.
+- Responsive down to mobile. Grids reflow, no horizontal overflow.
+- Visible keyboard focus. `prefers-reduced-motion` respected.
+- Poster URLs stay `https://image.tmdb.org/t/p/w342{poster_path}`.
+
+---
+
+## Out of scope
+
+Do not build: person search results, public or multi user reviews, provider
+logo deduplication, or any changes to `server/`.

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getProviders, getTitleDetails } from '../api/client.js';
+import ReviewSection from '../components/ReviewSection.jsx';
 import { useAuth } from '../context/useAuth.js';
 import { backdropUrl, posterUrl } from '../lib/images.js';
 import styles from './TitleDetails.module.css';
@@ -164,10 +165,7 @@ function TitleDetailsView({ mediaType, id }) {
             )}
           </section>
 
-          <section className={styles.reviews}>
-            <h2 className={styles.sectionHeading}>Reviews</h2>
-            <p className={styles.reviewsPlaceholder}>Reviews are coming in a later phase.</p>
-          </section>
+          <ReviewSection mediaType={mediaType} tmdbId={id} />
         </div>
       </div>
     </div>

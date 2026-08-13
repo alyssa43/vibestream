@@ -1,0 +1,83 @@
+.stateWrap {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: calc(var(--nav-height) + 32px) 20px 40px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.link {
+  color: var(--cyan);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.page {
+  padding: calc(var(--nav-height) + 32px) 0 80px;
+  min-height: 100svh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 clamp(20px, 4vw, 48px);
+  margin-bottom: 28px;
+}
+
+.accentBar {
+  width: 4px;
+  height: 40px;
+  border-radius: 2px;
+  background: var(--header-accent);
+  flex-shrink: 0;
+}
+
+.name {
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.description {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.error {
+  padding: 0 clamp(20px, 4vw, 48px);
+  margin-bottom: 16px;
+  color: var(--danger);
+  font-size: 0.85rem;
+}
+
+.loadMoreWrap {
+  display: flex;
+  justify-content: center;
+  padding: 24px clamp(20px, 4vw, 48px) 0;
+}
+
+.loadMoreButton {
+  padding: 12px 28px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.loadMoreButton:hover {
+  background: var(--surface-hover);
+  border-color: var(--violet);
+}
+
+.loadMoreButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

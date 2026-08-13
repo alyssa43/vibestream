@@ -1,17 +1,9 @@
-import { useEffect, useState } from 'react';
-import { getVibes } from '../api/client.js';
+import { useVibes } from '../context/useVibes.js';
 import VibeRow from '../components/VibeRow.jsx';
 import styles from './Home.module.css';
 
 export default function Home() {
-  const [vibes, setVibes] = useState(null);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    getVibes()
-      .then(({ vibes: list }) => setVibes(list))
-      .catch((err) => setError(err.message || 'Something went wrong.'));
-  }, []);
+  const { vibes, error } = useVibes();
 
   return (
     <>

@@ -1,0 +1,47 @@
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--card-accent) 16%, var(--surface)),
+    var(--bg-obsidian)
+  );
+  border: 1px solid color-mix(in srgb, var(--card-accent) 40%, transparent);
+  min-height: 160px;
+  transform: scale(1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover,
+.card:focus-visible {
+  transform: scale(1.02);
+  box-shadow: 0 0 0 1px var(--card-accent), 0 12px 28px -8px var(--card-accent);
+}
+
+.accentBar {
+  width: 32px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--card-accent);
+}
+
+.name {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.description {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card:hover,
+  .card:focus-visible {
+    transform: none;
+  }
+}

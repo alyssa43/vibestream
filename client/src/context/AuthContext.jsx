@@ -92,10 +92,18 @@ export function AuthProvider({ children }) {
   }, []);
 
   const removeFromWatchlist = useCallback(async (mediaType, tmdbId) => {
-    await apiRemoveFromWatchlist(mediaType, tmdbId);
-    setWatchlist((prev) =>
-      prev.filter((t) => !(t.media_type === mediaType && t.tmdb_id === Number(tmdbId)))
-    );
+    let removed;
+    setWatchlist((prev) => {
+      removed = prev.find((t) => t.media_type === mediaType && t.tmdb_id === Number(tmdbId));
+      return prev.filter((t) => !(t.media_type === mediaType && t.tmdb_id === Number(tmdbId)));
+    });
+
+    try {
+      await apiRemoveFromWatchlist(mediaType, tmdbId);
+    } catch (err) {
+      if (removed) setWatchlist((prev) => [removed, ...prev]);
+      throw err;
+    }
   }, []);
 
   const value = {

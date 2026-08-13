@@ -1,0 +1,42 @@
+.wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.removeButton {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(8, 7, 12, 0.75);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease;
+}
+
+.wrap:hover .removeButton,
+.wrap:focus-within .removeButton,
+.removeButton:focus-visible {
+  opacity: 1;
+}
+
+.removeButton:hover {
+  background: var(--danger);
+}
+
+.removeButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+@media (hover: none) {
+  .removeButton {
+    opacity: 1;
+  }
+}

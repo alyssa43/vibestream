@@ -177,17 +177,6 @@
   font-size: 0.85rem;
 }
 
-.reviews {
-  padding: 20px;
-  border: 1px dashed var(--border);
-  border-radius: var(--radius-md);
-}
-
-.reviewsPlaceholder {
-  color: var(--text-muted);
-  font-size: 0.85rem;
-}
-
 @media (max-width: 720px) {
   .content {
     grid-template-columns: 1fr;

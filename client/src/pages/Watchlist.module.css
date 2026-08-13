@@ -1,0 +1,23 @@
+.page {
+  padding: calc(var(--nav-height) + 32px) 0 80px;
+  min-height: 100svh;
+}
+
+.heading {
+  padding: 0 clamp(20px, 4vw, 48px);
+  margin-bottom: 24px;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.loading {
+  padding: 0 clamp(20px, 4vw, 48px);
+  color: var(--text-muted);
+}
+
+.error {
+  padding: 0 clamp(20px, 4vw, 48px);
+  margin-bottom: 16px;
+  color: var(--danger);
+  font-size: 0.85rem;
+}

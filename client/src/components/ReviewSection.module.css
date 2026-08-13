@@ -1,0 +1,181 @@
+.reviews {
+  padding: 20px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+}
+
+.sectionHeading {
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+.loading {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.error {
+  color: var(--danger);
+  font-size: 0.85rem;
+}
+
+.reviewView {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reviewText {
+  line-height: 1.6;
+  max-width: 68ch;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.updatedAt {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.primaryButton,
+.secondaryButton,
+.dangerButton {
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.85rem;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.primaryButton {
+  background: var(--violet);
+  color: #fff;
+}
+
+.primaryButton:hover {
+  background: color-mix(in srgb, var(--violet) 85%, white);
+}
+
+.secondaryButton {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.secondaryButton:hover {
+  background: var(--surface);
+}
+
+.dangerButton {
+  background: transparent;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.dangerButton:hover {
+  background: color-mix(in srgb, var(--danger) 15%, transparent);
+}
+
+.primaryButton:disabled,
+.secondaryButton:disabled,
+.dangerButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.emptyReview {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.emptyReviewText {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.textarea,
+.tagInput {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
+}
+
+.textarea::placeholder,
+.tagInput::placeholder {
+  color: var(--text-muted);
+}
+
+.textarea:focus-visible,
+.tagInput:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+.tagChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 4px 8px 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.tagRemove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.tagRemove:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
