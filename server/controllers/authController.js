@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import pool from '../db/pool.js';
+import Review from '../models/Review.js';
 
 const BCRYPT_COST = 12;
 const MIN_PASSWORD_LENGTH = 8;
@@ -110,5 +111,60 @@ export async function getCurrentUser(req, res) {
   } catch (err) {
     console.error('Error fetching current user:', err);
     res.status(500).json({ error: 'Failed to fetch user' });
+  }
+}
+
+// DELETE /api/auth/account -- permanently delete the current user's account
+// and everything tied to it (route is wrapped in requireAuth)
+export async function deleteAccount(req, res) {
+  const { password } = req.body;
+
+  if (!password) {
+    return res.status(400).json({ error: 'Password is required to delete your account' });
+  }
+
+  try {
+    const { rows } = await pool.query('SELECT password_hash FROM users WHERE id = $1', [
+      req.session.userId,
+    ]);
+
+    const user = rows[0];
+
+    if (!user) {
+      return res.status(401).json({ error: 'Not logged in' });
+    }
+
+    const passwordMatches = await bcrypt.compare(password, user.password_hash);
+
+    if (!passwordMatches) {
+      return res.status(401).json({ error: 'Incorrect password' });
+    }
+
+    // Delete Mongo reviews first. This is idempotent -- deleteMany against
+    // zero matches is a no-op, not an error -- so if the Postgres delete
+    // below fails, the account still exists and the request can safely be
+    // retried. Deleting Postgres first risks orphaned reviews in Mongo with
+    // no account left to retry through.
+    await Review.deleteMany({ user_id: req.session.userId });
+
+    // Cascades to watchlist via ON DELETE CASCADE. Does NOT cascade to the
+    // session table, connect-pg-simple has no foreign key to users, so the
+    // current session is destroyed explicitly below. Sessions for this user
+    // on other devices are left to expire naturally (up to 1 week).
+    await pool.query('DELETE FROM users WHERE id = $1', [req.session.userId]);
+
+    req.session.destroy((err) => {
+      if (err) {
+        // Account and reviews are already gone at this point, so the
+        // deletion itself succeeded. Log it, but don't report it as a
+        // failure to the user.
+        console.error('Error destroying session after account deletion:', err);
+      }
+      res.clearCookie('connect.sid');
+      res.status(204).end();
+    });
+  } catch (err) {
+    console.error('Error deleting account:', err);
+    res.status(500).json({ error: 'Failed to delete account. Please try again.' });
   }
 }
