@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   addToWatchlist as apiAddToWatchlist,
+  deleteAccount as apiDeleteAccount,
   getMe,
   getWatchlist,
   login as apiLogin,
@@ -74,6 +75,12 @@ export function AuthProvider({ children }) {
     setWatchlist([]);
   }, []);
 
+  const deleteAccount = useCallback(async (password) => {
+    await apiDeleteAccount(password);
+    setUser(null);
+    setWatchlist([]);
+  }, []);
+
   const isOnWatchlist = useCallback(
     (mediaType, tmdbId) =>
       watchlist.some((t) => t.media_type === mediaType && t.tmdb_id === Number(tmdbId)),
@@ -114,6 +121,7 @@ export function AuthProvider({ children }) {
     login,
     signup,
     logout,
+    deleteAccount,
     addToWatchlist,
     removeFromWatchlist,
   };

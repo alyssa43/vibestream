@@ -24,7 +24,8 @@ async function request(path, options = {}) {
 const get = (path) => request(path);
 const post = (path, body) => request(path, { method: 'POST', body: JSON.stringify(body) });
 const put = (path, body) => request(path, { method: 'PUT', body: JSON.stringify(body) });
-const del = (path) => request(path, { method: 'DELETE' });
+const del = (path, body) =>
+  request(path, { method: 'DELETE', ...(body ? { body: JSON.stringify(body) } : {}) });
 
 // Public
 export const getVibes = () => get('/vibes');
@@ -40,6 +41,7 @@ export const signup = (email, password) => post('/auth/signup', { email, passwor
 export const login = (email, password) => post('/auth/login', { email, password });
 export const logout = () => post('/auth/logout');
 export const getMe = () => get('/auth/me');
+export const deleteAccount = (password) => del('/auth/account', { password });
 
 // Watchlist (protected)
 export const getWatchlist = () => get('/watchlist');

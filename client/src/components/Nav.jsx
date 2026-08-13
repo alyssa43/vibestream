@@ -11,22 +11,48 @@ const NAV_LINKS = [
 ];
 
 export default function Nav() {
-  const { user, logout } = useAuth();
+  const { user, logout, deleteAccount } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [password, setPassword] = useState('');
+  const [deleteError, setDeleteError] = useState('');
+  const [deleting, setDeleting] = useState(false);
   const menuRef = useRef(null);
   const navigate = useNavigate();
+
+  function closeMenu() {
+    setMenuOpen(false);
+    setConfirmingDelete(false);
+    setPassword('');
+    setDeleteError('');
+  }
+
+  function backToMenu() {
+    setConfirmingDelete(false);
+    setPassword('');
+    setDeleteError('');
+  }
 
   useEffect(() => {
     if (!menuOpen) return;
 
     function handlePointer(e) {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setMenuOpen(false);
+        if (confirmingDelete) {
+          backToMenu();
+        } else {
+          closeMenu();
+        }
       }
     }
 
     function handleKey(e) {
-      if (e.key === 'Escape') setMenuOpen(false);
+      if (e.key !== 'Escape') return;
+      if (confirmingDelete) {
+        backToMenu();
+      } else {
+        closeMenu();
+      }
     }
 
     document.addEventListener('mousedown', handlePointer);
@@ -35,12 +61,28 @@ export default function Nav() {
       document.removeEventListener('mousedown', handlePointer);
       document.removeEventListener('keydown', handleKey);
     };
-  }, [menuOpen]);
+  }, [menuOpen, confirmingDelete]);
 
   async function handleLogout() {
-    setMenuOpen(false);
+    closeMenu();
     await logout();
     navigate('/');
+  }
+
+  async function handleDeleteAccount() {
+    if (!password) return;
+    setDeleting(true);
+    setDeleteError('');
+    try {
+      await deleteAccount(password);
+      closeMenu();
+      navigate('/');
+    } catch (err) {
+      setPassword('');
+      setDeleteError(err.message);
+    } finally {
+      setDeleting(false);
+    }
   }
 
   return (
@@ -78,9 +120,55 @@ export default function Nav() {
             {menuOpen && (
               <div className={styles.menu} role="menu">
                 <p className={styles.menuEmail}>{user.email}</p>
-                <button type="button" className={styles.menuItem} onClick={handleLogout} role="menuitem">
-                  Log out
-                </button>
+                {confirmingDelete ? (
+                  <div className={styles.deleteConfirm}>
+                    <p className={styles.deleteWarning}>
+                      This permanently deletes your account, watchlist, and reviews. This
+                      can&apos;t be undone.
+                    </p>
+                    {deleteError && <p className={styles.deleteError}>{deleteError}</p>}
+                    <input
+                      type="password"
+                      className={styles.deleteInput}
+                      placeholder="Confirm your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={deleting}
+                    />
+                    <div className={styles.deleteActions}>
+                      <button
+                        type="button"
+                        className={styles.menuItem}
+                        onClick={backToMenu}
+                        disabled={deleting}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.deleteConfirmButton}
+                        onClick={handleDeleteAccount}
+                        disabled={deleting || !password}
+                      >
+                        Delete my account
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <button type="button" className={styles.menuItem} onClick={handleLogout} role="menuitem">
+                      Log out
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.menuItemDanger}
+                      onClick={() => setConfirmingDelete(true)}
+                      role="menuitem"
+                    >
+                      Delete account
+                    </button>
+                  </>
+                )}
               </div>
             )}
           </>
