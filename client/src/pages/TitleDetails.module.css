@@ -1,0 +1,199 @@
+.stateWrap {
+  padding: calc(var(--nav-height) + 80px) clamp(20px, 4vw, 48px) 80px;
+  color: var(--text-muted);
+}
+
+.page {
+  position: relative;
+}
+
+.backdropWrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: min(70vh, 640px);
+  z-index: 0;
+  overflow: hidden;
+}
+
+.backdrop {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(8, 7, 12, 0.35) 0%,
+    rgba(8, 7, 12, 0.75) 55%,
+    var(--bg) 100%
+  );
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(180px, 280px) 1fr;
+  gap: clamp(24px, 4vw, 48px);
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: calc(var(--nav-height) + 12vh) clamp(20px, 4vw, 48px) 80px;
+}
+
+.poster {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.posterPlaceholder {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 16px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.infoCol {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-self: end;
+}
+
+.title {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 700;
+}
+
+.meta {
+  display: flex;
+  gap: 16px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.genrePill {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.tagline {
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+.overview {
+  max-width: 68ch;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.listButton,
+.listButtonActive {
+  align-self: flex-start;
+  padding: 12px 22px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.listButton {
+  background: var(--violet);
+  color: #fff;
+}
+
+.listButton:hover {
+  background: color-mix(in srgb, var(--violet) 85%, white);
+}
+
+.listButtonActive {
+  background: transparent;
+  border-color: var(--violet);
+  color: var(--text);
+}
+
+.listButtonActive:hover {
+  background: var(--surface);
+}
+
+.listButton:disabled,
+.listButtonActive:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.sectionHeading {
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.providers {
+  padding-top: 8px;
+}
+
+.providerLogos {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.providerLogo {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+}
+
+.providersEmpty {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.reviews {
+  padding: 20px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+}
+
+.reviewsPlaceholder {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 720px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+
+  .posterCol {
+    max-width: 200px;
+  }
+}

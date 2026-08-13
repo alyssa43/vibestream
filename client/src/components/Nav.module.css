@@ -1,0 +1,144 @@
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: var(--nav-height);
+  display: flex;
+  align-items: center;
+  padding: 0 clamp(20px, 4vw, 48px);
+  background: rgba(8, 7, 12, 0.75);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.wordmark {
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  flex: 0 0 auto;
+}
+
+.wordmarkAccent {
+  color: var(--violet);
+}
+
+.links {
+  display: flex;
+  gap: clamp(16px, 3vw, 36px);
+  flex: 1;
+  justify-content: center;
+}
+
+.link {
+  display: inline-block;
+  padding: 6px 2px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.link:hover {
+  color: var(--text);
+}
+
+.linkActive {
+  color: var(--text);
+  border-bottom-color: var(--violet);
+}
+
+.account {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.accountButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.accountButton:hover {
+  border-color: var(--violet);
+  background: var(--surface-hover);
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 200px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+.menuEmail {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  padding: 4px 8px 10px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 6px;
+  word-break: break-all;
+}
+
+.menuItem {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.menuItem:hover {
+  background: var(--surface-hover);
+}
+
+@media (max-width: 720px) {
+  .links {
+    gap: 14px;
+  }
+
+  .link {
+    font-size: 0.68rem;
+  }
+
+  .wordmark {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .nav {
+    padding: 0 16px;
+  }
+
+  .links {
+    gap: 10px;
+  }
+
+  .link {
+    font-size: 0.6rem;
+    letter-spacing: 0.06em;
+  }
+}

@@ -1,0 +1,123 @@
+.row {
+  position: relative;
+  padding: 20px 0;
+}
+
+.row::before {
+  content: '';
+  position: absolute;
+  inset: -10% -4% auto -4%;
+  height: 260px;
+  background: radial-gradient(60% 100% at 50% 0%, color-mix(in srgb, var(--row-accent) 16%, transparent), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 0 clamp(20px, 4vw, 48px);
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.accentBar {
+  width: 4px;
+  height: 18px;
+  border-radius: 2px;
+  background: var(--row-accent);
+  align-self: center;
+}
+
+.name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.description {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.stripWrap {
+  position: relative;
+  z-index: 1;
+}
+
+.strip {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scroll-behavior: smooth;
+  padding: 4px clamp(20px, 4vw, 48px) 8px;
+  scrollbar-width: none;
+}
+
+.strip::-webkit-scrollbar {
+  display: none;
+}
+
+.skeletonCard {
+  flex: 0 0 auto;
+  width: clamp(120px, 14vw, 168px);
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-md);
+  background: linear-gradient(100deg, var(--surface) 30%, var(--surface-hover) 50%, var(--surface) 70%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.error,
+.empty {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: 24px 4px;
+}
+
+.error {
+  color: var(--danger);
+}
+
+.scrollButton {
+  position: absolute;
+  top: 50%;
+  right: clamp(4px, 1.5vw, 18px);
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: rgba(20, 19, 32, 0.9);
+  backdrop-filter: blur(4px);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.scrollButton:hover {
+  background: var(--surface-hover);
+  border-color: var(--row-accent);
+}
+
+@media (max-width: 720px) {
+  .scrollButton {
+    display: none;
+  }
+}

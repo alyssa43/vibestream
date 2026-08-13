@@ -1,0 +1,34 @@
+.wrap {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: calc(var(--nav-height) + 32px) 20px 40px;
+  text-align: center;
+}
+
+.code {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--violet);
+}
+
+.heading {
+  font-size: 2rem;
+  font-weight: 700;
+  text-transform: lowercase;
+}
+
+.copy {
+  color: var(--text-muted);
+}
+
+.link {
+  margin-top: 12px;
+  color: var(--cyan);
+  font-weight: 600;
+  font-size: 0.9rem;
+}

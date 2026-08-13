@@ -1,0 +1,68 @@
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: calc(var(--nav-height) + 96px) clamp(20px, 4vw, 48px) 72px;
+  min-height: 62vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 22px;
+}
+
+.heroGlow {
+  position: absolute;
+  top: -20%;
+  right: -10%;
+  width: 60vw;
+  height: 60vw;
+  max-width: 900px;
+  max-height: 900px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--violet) 35%, transparent) 0%, color-mix(in srgb, var(--pink) 18%, transparent) 40%, transparent 70%);
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.headline {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(2.6rem, 6.4vw, 4.8rem);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.01em;
+  text-transform: lowercase;
+  max-width: 16ch;
+}
+
+.gradientText {
+  background: linear-gradient(90deg, var(--violet), var(--pink));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.subheadline {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+  color: var(--text-muted);
+  max-width: 42ch;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 64px;
+}
+
+.loading,
+.error {
+  padding: 0 clamp(20px, 4vw, 48px);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.error {
+  color: var(--danger);
+}
