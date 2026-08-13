@@ -8,7 +8,7 @@ import { VibesProvider } from './context/VibesContext.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter basename='/vibestream'>
+    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
       <AuthProvider>
         <VibesProvider>
           <App />
