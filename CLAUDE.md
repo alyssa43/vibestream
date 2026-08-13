@@ -135,26 +135,31 @@ it has no effect on `fetch` calls.
 
 ## Known technical debt, deliberately accepted
 
-**Homepage rows fetch live, and this now causes real rate limiting.** `GET
-/api/vibes/:slug` fires one TMDB call per title, so a single row costs 20 to 34
-requests and the full homepage costs over 200. In production this returns 429 Too
-Many Requests from TMDB, and because `fetchTmdbDetailsMany` drops failed titles
-silently, rows render short or empty depending on timing. The fix is caching
-`title`, `poster_path`, and `release_date` into the `vibe_titles` table and
-backfilling once. This is no longer a stretch goal.
+**Homepage rows used to fetch live from TMDB; this is now fixed.** `GET
+/api/vibes/:slug` previously fired one TMDB call per title (20 to 34 requests
+per row, 200+ per homepage load), which caused real 429s in production.
+`title`, `poster_path`, `release_date`, and `vote_average` are now cached on
+`vibe_titles` and backfilled via `server/db/backfill-vibe-titles.js`, which is
+safe to rerun since it only touches rows where `title IS NULL`. `getVibe`
+reads these columns directly and makes no TMDB calls. See
+`server/db/migrations/001_vibe_titles_cache.sql`.
 
-Note this affects only the curated rows. Discover, search, and title details each
-cost one or two calls per request and are fine.
+`release_date` is selected with `TO_CHAR(release_date, 'YYYY-MM-DD')` rather
+than returned as a raw `DATE` column. `pg` parses `DATE` into a JS `Date`
+object, and `JSON.stringify` converts that to UTC, which can shift the date by
+a day depending on the server's timezone. Don't remove the `TO_CHAR` cast
+without understanding why it's there.
 
-**Rows can silently return fewer titles than curated.** `fetchTmdbDetailsMany`
-drops any title whose individual TMDB fetch fails and returns a shorter array with
-no error signal. A vibe curated for 24 titles may render 19. Expected behavior,
-not a client bug.
+Discover, search, and title details each still cost one or two live TMDB
+calls per request. That's fine, this fix only addressed the curated rows.
 
-**Rows can silently return fewer titles than curated.** `fetchTmdbDetailsMany`
-drops any title whose individual TMDB fetch fails and returns a shorter array
-with no error signal. A vibe curated for 24 titles may render 19. This is
-expected behavior, not a client bug.
+**Rows can silently return fewer titles than expected.** For curated vibe
+rows, this can now only happen if a title was added to `vibe_titles` and the
+backfill script hasn't been rerun since, in which case `getVibe` filters out
+its null `title` rather than erroring. For the watchlist
+(`GET /api/watchlist`), which still calls TMDB live via `fetchTmdbDetailsMany`,
+this happens the original way, a failed individual TMDB fetch is dropped with
+no error signal. Both are expected behavior, not a client bug.
 
 **Email enumeration is only half closed.** Login returns a deliberately vague
 "Invalid email or password" for both wrong email and wrong password. Signup
@@ -165,11 +170,6 @@ signup vague too would badly hurt the user experience.
 **`AVN Awards` (TMDB ID 71932) is blocklisted** in
 `controllers/discoverController.js`. TMDB's `include_adult` flag is unreliable
 for TV and this entry surfaces in the Reality genre.
-
-**Rows can silently return fewer titles than curated.** `fetchTmdbDetailsMany`
-drops any title whose individual TMDB fetch fails and returns a shorter array
-with no error signal. A vibe curated for 24 titles may render 19. This is
-expected behavior, not a client bug.
 
 ## Commands
 

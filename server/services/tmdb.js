@@ -31,16 +31,19 @@ export async function fetchTmdbDetails(tmdbId, mediaType) {
       poster_path: data.poster_path,
       release_date: data.release_date || data.first_air_date,
       overview: data.overview,
+      vote_average: data.vote_average,
     };
   } catch (err) {
-    console.error(`TMDB fetch failed for ${mediaType}/${tmdbId}: ${err.message}`);
+    console.error(
+      `TMDB fetch failed for ${mediaType}/${tmdbId}: ${err.message}`,
+    );
     return null;
   }
 }
 
 export async function fetchTmdbDetailsMany(rows) {
   const results = await Promise.all(
-    rows.map((row) => fetchTmdbDetails(row.tmdb_id, row.media_type))
+    rows.map((row) => fetchTmdbDetails(row.tmdb_id, row.media_type)),
   );
 
   return results.filter((item) => item !== null);

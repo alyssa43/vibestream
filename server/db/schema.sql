@@ -20,6 +20,10 @@ CREATE TABLE vibe_titles (
   tmdb_id INTEGER NOT NULL,
   media_type VARCHAR(10) NOT NULL CHECK (media_type IN ('movie', 'tv')),
   sort_order INTEGER NOT NULL,
+  title VARCHAR(255),
+  poster_path VARCHAR(255),
+  release_date DATE,
+  vote_average NUMERIC(3,1),
   UNIQUE(vibe_slug, tmdb_id, media_type)
 );
 
