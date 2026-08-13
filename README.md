@@ -241,3 +241,81 @@ Three location blocks above the portfolio's `location /`:
   `try_files` falling back to `index.html` so client-side routes resolve
 
 ### Deploying an update
+
+Both apps live on the same droplet under PM2. Confirm what you're working
+with before changing anything:
+
+```
+pm2 list
+pm2 describe vibestream | grep -E "script path|exec cwd"
+```
+
+The repo is at `/home/alyssa/vibestream`. PM2 runs the API from
+`server/server.js` with the working directory set to `server/`.
+
+#### VibeStream
+
+```
+cd ~/vibestream
+git pull
+cd client && npm run build
+pm2 restart vibestream
+```
+
+**The build step is not optional.** Per the Nginx section above,
+`/vibestream/` is an `alias` onto `client/dist`, not a copy, so the build
+output on the droplet *is* what visitors receive.
+
+Pulling without rebuilding leaves the old bundle in
+place and the frontend changes silently do not appear, even though `git
+pull` reported success.
+
+`pm2 restart` only reloads the Express API. It has no effect on the
+frontend. If a change touched only `client/`, the restart is unnecessary
+but harmless; if it touched only `server/`, the build is unnecessary but
+harmless. Running both is the safe default.
+
+Run `npm install` only when the pull changed a `package.json`. The
+droplet has 512MB of RAM, so watch for the build being killed rather
+than failing. Check with `free -h` if a build dies without an error
+message.
+
+Verify the API came back up:
+
+```
+curl -s -i https://alyssaeaster.dev/vibestream/api/health
+```
+
+A 200 confirms both Express and the Nginx proxy. Then load a title page
+in a browser and confirm the frontend actually changed, since a
+successful build and a deployed build are not the same thing. The asset
+hashes printed by `npm run build` should match the ones from the local
+build of the same commit.
+
+#### Portfolio site
+
+The portfolio at the domain root is a separate repo with no build step,
+plain Express serving static files from `public/`:
+
+```
+cd ~/portfolio-landing
+git pull
+pm2 restart portfolio
+```
+
+Never edit either repo directly on the droplet. The next `git pull`
+reverts the change with no warning.
+
+#### When something looks wrong
+
+`pm2 logs vibestream --lines 50` for API errors. `pm2 describe vibestream`
+confirms the process is running the path you think it is.
+
+A frontend change that did not appear is almost always a skipped
+`npm run build`, or browser cache. Hard refresh with `Cmd+Shift+R`
+before debugging anything else.
+
+Logged-in routes failing while login itself appears to succeed points at
+`app.set('trust proxy', 1)` in `server.js`. See the trust proxy note
+above: without it Express refuses to set secure session cookies behind
+Nginx, silently and with no error.
