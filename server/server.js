@@ -13,6 +13,12 @@ import discoverRouter from './routes/discover.js';
 import { connectMongo } from './db/mongo.js';
 
 const app = express();
+
+// Nginx terminates SSL and forwards over plain HTTP, so Express sees an
+// insecure connection. Trusting the proxy makes it read X-Forwarded-Proto
+// instead, which is required for secure session cookies to be set at all.
+app.set('trust proxy', 1);
+
 const PORT = process.env.PORT || 3001;
 const PgSession = pgSession(session);
 
